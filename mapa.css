@@ -1,0 +1,429 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.map {
+    flex: 1;
+    position: relative;
+}
+
+.map-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 400;
+    display: flex;
+    gap: 10px;
+}
+
+/* Overlay de carregamento da rota */
+.route-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255,255,255,0.95);
+    padding: 18px 22px;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.route-loading.hidden { display: none; }
+
+.spinner {
+    width: 34px;
+    height: 34px;
+    border: 4px solid #e6e6e6;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text { font-weight:600; color:#2c3e50; }
+
+@keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+
+.btn-mapa-toggle {
+    padding: 10px 16px;
+    background: white;
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.btn-mapa-toggle:hover {
+    background: #3498db;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.btn-mapa-toggle.ativo {
+    background: #3498db;
+    color: white;
+}
+
+.sidebar {
+    width: 360px;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 10px;
+}
+
+h3 {
+    color: #34495e;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+}
+
+.search-section,
+.info-section,
+.instruction-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #3498db;
+}
+
+.input-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+label {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+input {
+    padding: 12px;
+    border: 2px solid #ecf0f1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.coords {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    padding: 8px;
+    background: white;
+    border-radius: 4px;
+    min-height: 20px;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-origin {
+    background: #3498db;
+    color: white;
+}
+
+.btn-origin:hover {
+    background: #2980b9;
+}
+
+.btn-destination {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-destination:hover {
+    background: #c0392b;
+}
+
+.btn-trace {
+    background: #27ae60;
+    color: white;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.btn-trace:hover {
+    background: #229954;
+}
+
+.btn-clear {
+    background: #95a5a6;
+    color: white;
+    width: 100%;
+}
+
+.btn-clear:hover {
+    background: #7f8c8d;
+}
+
+.btn-location {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    width: 100%;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.btn-location:hover {
+    background: linear-gradient(135deg, #8e44ad, #7d3c98);
+}
+
+.btn-location:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.status-message {
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    text-align: center;
+    min-height: 20px;
+    display: none;
+}
+
+.status-message.loading {
+    display: block;
+    background: #e8f8f5;
+    color: #27ae60;
+    border-left: 4px solid #27ae60;
+}
+
+.status-message.success {
+    display: block;
+    background: #d5f4e6;
+    color: #27ae60;
+    border-left: 4px solid #27ae60;
+}
+
+.status-message.error {
+    display: block;
+    background: #fadbd8;
+    color: #e74c3c;
+    border-left: 4px solid #e74c3c;
+}
+
+.status-message.info {
+    display: block;
+    background: #d6eaf8;
+    color: #3498db;
+    border-left: 4px solid #3498db;
+}
+
+.info-section {
+    border-left-color: #27ae60;
+    flex-grow: 1;
+}
+
+#rotaInfo {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+#rotaInfo p {
+    margin: 8px 0;
+}
+
+#rotaInfo strong {
+    color: #2c3e50;
+}
+
+.instruction-section {
+    border-left-color: #f39c12;
+}
+
+.instruction-section ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.instruction-section li {
+    padding: 8px 0;
+    padding-left: 20px;
+    position: relative;
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.instruction-section li:before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #f39c12;
+    font-weight: bold;
+}
+
+/* Formulário de solicitação */
+.form-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid #27ae60;
+}
+
+.form-section .input-group {
+    margin-bottom: 10px;
+}
+
+.form-section input,
+.form-section select,
+.form-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ecf0f1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: white;
+}
+
+.form-section textarea {
+    resize: vertical;
+}
+
+#envioStatus {
+    font-size: 0.92rem;
+    color: #2c3e50;
+}
+
+/* Leaflet customization */
+.leaflet-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.leaflet-routing-container {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 8px !important;
+}
+
+.leaflet-marker-pane img {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        max-height: 40vh;
+        order: 2;
+    }
+
+    .map {
+        height: 60vh;
+        order: 1;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        max-height: 50vh;
+        padding: 12px;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+    }
+
+    .input-group,
+    .info-section,
+    .instruction-section {
+        padding: 12px;
+    }
+}
+
+/* Scrollbar customization */
+.sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #bdc3c7;
+    border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #95a5a6;
+}

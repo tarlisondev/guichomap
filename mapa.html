@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traçador de Rotas</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="mapa.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>🗺️ Traçador de Rotas</h1>
+            
+            <div class="search-section">
+                <button id="btnMinhaLocalizacao" class="btn btn-location">📍 Minha Localização</button>
+                <div id="statusLocalizacao" class="status-message"></div>
+
+                <div class="input-group">
+                    <label>📍 Origem:</label>
+                    <div id="coordsOrigem" class="coords">Clique no mapa para definir a origem</div>
+                </div>
+
+                <div class="input-group">
+                    <label>📍 Destino:</label>
+                    <div id="coordsDestino" class="coords">Clique no mapa para definir o destino</div>
+                </div>
+
+                <button id="btnLimpar" class="btn btn-clear">Limpar</button>
+            </div>
+
+            <div class="form-section">
+                <h3>Enviar Solicitação</h3>
+                <div class="input-group">
+                    <label for="nome">Nome:</label>
+                    <input type="text" id="nome" placeholder="Seu nome">
+                </div>
+
+                <div class="input-group">
+                    <label for="telefone">Telefone:</label>
+                    <input type="tel" id="telefone" placeholder="(00) 00000-0000">
+                </div>
+
+                <div class="input-group">
+                    <label for="modelo">Modelo do veículo:</label>
+                    <input type="text" id="modelo" placeholder="Ex: Fiat Uno">
+                </div>
+
+                <div class="input-group">
+                    <label for="placa">Placa:</label>
+                    <input type="text" id="placa" placeholder="ABC1D23">
+                </div>
+
+                <div class="input-group">
+                    <label for="urgencia">Urgência:</label>
+                    <select id="urgencia">
+                        <option value="baixa">Baixa</option>
+                        <option value="media">Média</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="observacao">Observação:</label>
+                    <textarea id="observacao" rows="3" placeholder="Informações adicionais..."></textarea>
+                </div>
+
+                <div class="input-group">
+                    <button id="btnEnviarSolicitacao" class="btn btn-trace">Enviar Solicitação</button>
+                    <a href="solicitacoes.html" class="btn btn-clear" style="text-decoration:none;display:inline-block;text-align:center;">Ver Solicitações</a>
+                </div>
+
+                <div id="envioStatus" class="coords" style="min-height:24px;margin-top:6px;"></div>
+            </div>
+
+            <div class="info-section">
+                <h3>Informações da Rota</h3>
+                <div id="rotaInfo">
+                    <p>Nenhuma rota traçada</p>
+                </div>
+            </div>
+
+            <div class="instruction-section">
+                <h3>Como Usar:</h3>
+                <ul>
+                    <li>Clique no mapa para definir Origem e Destino</li>
+                    <li>Ou use "Minha Localização" para definir a origem</li>
+                    <li>Após definir os dois pontos a rota será traçada automaticamente</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="map" class="map">
+            <div class="map-controls">
+                <button id="btnAlternarMapa" class="btn-mapa-toggle" title="Alternar entre mapa e satélite">
+                    🛰️ Satélite
+                </button>
+            </div>
+            <!-- Overlay de carregamento da rota -->
+            <div id="routeLoading" class="route-loading hidden">
+                <div class="spinner"></div>
+                <div class="loading-text">Calculando rota...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="mapa.js"></script>
+</body>
+</html>
