@@ -29,14 +29,37 @@ if (!solicitacao) {
     titulo.textContent = `Rota: ${solicitacao.nome}`;
     subinfo.textContent = `Urgência: ${solicitacao.urgencia} — Enviado: ${new Date(solicitacao.timestamp).toLocaleString()}`;
 
-    if (solicitacao.origem && solicitacao.destino) {
-        const markerO = L.marker([solicitacao.origem.lat, solicitacao.origem.lng]).addTo(map).bindPopup('Origem').openPopup();
-        const markerD = L.marker([solicitacao.destino.lat, solicitacao.destino.lng]).addTo(map).bindPopup('Destino');
+    // Verificar se temos localização do operador
+    let pontoPartida, pontoDestino, labelPartida, labelDestino;
+
+    if (solicitacao.operadorLocalizacao && solicitacao.origem) {
+        // Rota da localização do operador para a origem da solicitação
+        pontoPartida = {
+            lat: solicitacao.operadorLocalizacao.latitude,
+            lng: solicitacao.operadorLocalizacao.longitude
+        };
+        pontoDestino = solicitacao.origem;
+        labelPartida = 'Sua Localização';
+        labelDestino = 'Origem da Solicitação';
+    } else if (solicitacao.origem && solicitacao.destino) {
+        // Rota original: origem para destino
+        pontoPartida = solicitacao.origem;
+        pontoDestino = solicitacao.destino;
+        labelPartida = 'Origem';
+        labelDestino = 'Destino';
+    } else {
+        subinfo.textContent += ' — Origem ou destino não definidos. Defina-os no mapa antes de iniciar.';
+        pontoPartida = null;
+    }
+
+    if (pontoPartida) {
+        const markerO = L.marker([pontoPartida.lat, pontoPartida.lng]).addTo(map).bindPopup(labelPartida).openPopup();
+        const markerD = L.marker([pontoDestino.lat, pontoDestino.lng]).addTo(map).bindPopup(labelDestino);
 
         const control = L.Routing.control({
             waypoints: [
-                L.latLng(solicitacao.origem.lat, solicitacao.origem.lng),
-                L.latLng(solicitacao.destino.lat, solicitacao.destino.lng)
+                L.latLng(pontoPartida.lat, pontoPartida.lng),
+                L.latLng(pontoDestino.lat, pontoDestino.lng)
             ],
             routeWhileDragging: false,
             addWaypoints: false,
@@ -46,8 +69,5 @@ if (!solicitacao) {
             lineOptions: { styles: [{ color: '#ff6b6b', weight: 6 }] },
             router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' })
         }).addTo(map);
-
-    } else {
-        subinfo.textContent += ' — Origem ou destino não definidos. Defina-os no mapa antes de iniciar.';
     }
 }

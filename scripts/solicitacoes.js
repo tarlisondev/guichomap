@@ -29,7 +29,8 @@ function carregarSolicitacoes() {
 
         const campoTelefone = document.createElement('div');
         campoTelefone.className = 'campo';
-        campoTelefone.textContent = `📞 ${item.telefone}`;
+        const telefoneDigitos = item.telefone.replace(/\D/g, '');
+        campoTelefone.innerHTML = `📞 ${item.telefone} <a href="https://wa.me/${telefoneDigitos}" target="_blank" class="btn-whatsapp" title="Enviar mensagem WhatsApp">💬</a>`;
 
         const campoVeiculo = document.createElement('div');
         campoVeiculo.className = 'campo';
@@ -66,8 +67,14 @@ function carregarSolicitacoes() {
     btnMarcarConcluida.textContent = 'Concluir';
     btnMarcarConcluida.addEventListener('click', () => concluirSolicitacao(item.id));
 
+    const btnCancelar = document.createElement('button');
+    btnCancelar.className = 'btn-small btn-cancel';
+    btnCancelar.textContent = 'Cancelar';
+    btnCancelar.addEventListener('click', () => cancelarSolicitacao(item.id));
+
     acoes.appendChild(btnIniciar);
     acoes.appendChild(btnMarcarConcluida);
+    acoes.appendChild(btnCancelar);
 
         div.appendChild(h);
         div.appendChild(meta);
@@ -110,10 +117,36 @@ function iniciarSolicitacao(id) {
 
     // marcar como em andamento
     lista[idx].status = 'em andamento';
-    atualizarListaEStorage(lista);
 
-    // abrir a página de rota passando id
-    window.location.href = `rota.html?id=${id}`;
+    // Solicitar localização do operador
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                // Sucesso: armazenar localização do operador
+                lista[idx].operadorLocalizacao = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                };
+                atualizarListaEStorage(lista);
+                window.location.href = `rota.html?id=${id}`;
+            },
+            (error) => {
+                // Erro: continuar sem localização
+                console.log('Erro ao obter localização:', error);
+                atualizarListaEStorage(lista);
+                window.location.href = `rota.html?id=${id}`;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            }
+        );
+    } else {
+        // Geolocalização não suportada: continuar sem localização
+        atualizarListaEStorage(lista);
+        window.location.href = `rota.html?id=${id}`;
+    }
 }
 
 function concluirSolicitacao(id) {
@@ -123,5 +156,15 @@ function concluirSolicitacao(id) {
     const idx = lista.findIndex(s => s.id === id);
     if (idx === -1) return;
     lista[idx].status = 'concluída';
+    atualizarListaEStorage(lista);
+}
+
+function cancelarSolicitacao(id) {
+    let raw = localStorage.getItem('solicitacoes');
+    if (!raw) return;
+    let lista = JSON.parse(raw);
+    const idx = lista.findIndex(s => s.id === id);
+    if (idx === -1) return;
+    lista[idx].status = 'cancelada';
     atualizarListaEStorage(lista);
 }
